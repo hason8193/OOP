@@ -3,64 +3,67 @@
 
 using namespace std;
 
-typedef struct So_Ao{
-    float thuc;
-    float ao;
-}SA;
+class SoPhuc{
+    private:
+    double thuc, ao;
+    public:
+    SoPhuc(){
+        thuc = 0;
+        ao = 0;
+    }
+    SoPhuc(double thuc, double ao){
+        this->thuc = thuc;
+        this->ao = ao;
+    }
+    ~SoPhuc(){
 
-SA operator + (SA s1, SA s2){
-    SA s;
-    s.thuc = s1.thuc + s2.thuc;
-    s.ao = s1.ao + s2.ao;
-    return s;
-}
-
-SA operator - (SA s1, SA s2){
-    SA s;
-    s.thuc = s1.thuc - s2.thuc;
-    s.ao = s1.ao - s2.ao;
-    return s;
-}
-
-SA operator * (SA s1, SA s2){
-    SA s;
-    s.thuc = s1.thuc * s2.thuc - s1.ao * s2.ao;
-    s.ao = s1.thuc * s2.ao + s1.ao * s2.thuc;
-    return s;
-}
-
-SA operator / (SA s1, SA s2){
-    SA s;
-    s.thuc = (s1.thuc * s2.thuc + s1.ao * s2.ao) / (pow(s2.thuc, 2) * pow(s2.ao, 2));
-    s.ao = (s1.ao * s2.thuc - s1.thuc * s2.ao) / (pow(s2.thuc, 2) * pow(s2.ao, 2));
-    return s;
-}
-
-istream & operator >> (istream &in, SA &s){
-    cout << "Nhap phan thuc:";
-    in >> s.thuc;
-    cout << "Nhap phan ao:";
-    in >> s.ao;
-    return in;
-}
-
-ostream & operator << (ostream &out, SA &s){
-    out << s.thuc << "+" << s.ao;
-    return out;
-}
+    }
+    friend istream& operator >> (istream &is, SoPhuc &s){
+        is >> s.thuc >> s.ao;
+        return is;
+    }
+    friend ostream& operator << (ostream &os, SoPhuc &s){
+        os << s.thuc << " + " << s.ao << "i";
+        return os;
+    }
+    SoPhuc operator + (SoPhuc &a){
+        SoPhuc b;
+        b.thuc = thuc + a.thuc;
+        b.ao = ao + a.ao;
+        return b;
+    }
+    SoPhuc operator - (SoPhuc &a){
+        SoPhuc b;
+        b.thuc = thuc - a.thuc;
+        b.ao = ao - a.ao;
+        return b;
+    }
+    SoPhuc operator * (SoPhuc &a){
+        SoPhuc b;
+        b.thuc = thuc * a.thuc - ao * a.ao;
+        b.ao = thuc * a.ao + ao * a.thuc;
+        return b;
+    }
+    SoPhuc operator / (SoPhuc &a){
+        SoPhuc b;
+        b.thuc = (thuc * a.thuc + ao * a.ao) / (pow(a.thuc, 2) * pow(a.ao, 2));
+        b.ao = (ao * a.thuc - thuc * a.ao) / (pow(a.thuc, 2) * pow(a.ao, 2));
+        return b;
+    }
+};
 
 int main(){
-    SA s1, s2, s3, s4, s5, s6;
-    cout << "Nhap s1:";
-    cin >> s1;
-    cout << "Nhap s2:";
-    cin >> s2;
-    s3 = s1 + s2;
-    cout << "Tong bang:" << s3 << endl;
-    s4 = s1 - s2;
-    cout << "Hieu bang:" << s4 << endl;
-    s5 = s1 * s2;
-    cout << "Tich bang:" << s5 << endl;
-    s6 = s1 / s2;
-    cout << "Thuong bang:" << s6 << endl;
+    SoPhuc p1, p2, p3;
+    cout << "Nhap phan thuc va phan ao cua p1:";
+    cin >> p1;
+    cout << "Nhap phan thuc va phan ao cua p2:";
+    cin >> p2;
+    p3 = p1 + p2;
+    cout << "Tong hai so phuc la: " << p3 << endl;
+    p3 = p1 - p2;
+    cout << "Hieu hai so phuc la: " << p3 << endl;
+    p3 = p1 * p2;
+    cout << "Tich hai so phuc la: " << p3 << endl;
+    p3 = p1 / p2;
+    cout << "Thuong hai so phuc la: " << p3 << endl;
 }

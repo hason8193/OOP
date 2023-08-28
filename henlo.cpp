@@ -1,43 +1,126 @@
-#include<iostream>
-
+#include <iostream>
+#include <vector>
 using namespace std;
 
-class Phan_So{
-    private:
-    int tu, mau;
-    public:
-    Phan_So(){
-        tu = 0;
-        mau = 1;
-    }
-    Phan_So(int tu, int mau){
-        this->tu = tu;
-        this->mau = mau;
-    }
-    void Nhap(){
-        cin >> tu >> mau;
-        if (mau == 0) cin >> mau;
-    }
-    void Xuat(){
-        cout << tu << "/" << mau << endl;
-    }
-    int gcd(int tu, int mau) {
-    return mau == 0 ? abs(tu) : gcd(mau, tu % mau);
-}
-
-void Rut_Gon() {
-    int g = gcd(tu, mau);
-    tu /= g;
-    mau /= g;
-}
+class Gatekeeper {
+public:
+    virtual ~Gatekeeper() {}
+    virtual bool passGate(int& princeMoney, int& princeIntelligence, int& princeStrength) = 0;
 };
-int main(){
-    Phan_So A;
-    int n;
-    cin >> n;
-    for(int i = 0; i < n; i++){
-        A.Nhap();
-        A.Rut_Gon();
-        A.Xuat();
+
+class Merchant : public Gatekeeper {
+private:
+    int unitPrice;
+    int quantity;
+public:
+    Merchant(int unitPrice, int quantity) {
+        this->unitPrice = unitPrice;
+        this->quantity = quantity;
     }
+
+    bool passGate(int& princeMoney, int& princeIntelligence, int& princeStrength)  {
+        int requiredMoney = unitPrice * quantity;
+        if (requiredMoney <= princeMoney) {
+            princeMoney -= requiredMoney;
+            return true;
+        }
+        return false;
+    }
+};
+
+class Philosopher : public Gatekeeper {
+private:
+    int intelligenceIndex;
+public:
+    Philosopher(int index) : intelligenceIndex(index) {}
+
+    bool passGate(int& princeMoney, int& princeIntelligence, int& princeStrength)  {
+        return princeIntelligence >= intelligenceIndex;
+    }
+};
+
+class Warrior : public Gatekeeper {
+private:
+    int strengthIndex;
+public:
+    Warrior(int index) : strengthIndex(index) {}
+
+    bool passGate(int& princeMoney, int& princeIntelligence, int& princeStrength)  {
+        if (princeStrength >= strengthIndex) {
+            princeStrength -= strengthIndex;
+            return true;
+        }
+        return false;
+    }
+};
+
+class Gate {
+private:
+    int gateType;
+    Gatekeeper* gatekeeper;
+public:
+    Gate(int type, Gatekeeper* keeper) : gateType(type), gatekeeper(keeper) {}
+
+    bool passGate(int& princeMoney, int& princeIntelligence, int& princeStrength)  {
+        return gatekeeper->passGate(princeMoney, princeIntelligence, princeStrength);
+    }
+
+    ~Gate() {
+        delete gatekeeper;
+    }
+};
+
+int main() {
+    int numGates;
+    cin >> numGates;
+
+    vector<Gate*> gates;
+    for (int i = 0; i < numGates; ++i) {
+        int gateType;
+        cin >> gateType;
+
+        Gatekeeper* keeper = nullptr;
+        if (gateType == 1) {
+            int unitPrice;
+            int quantity;
+            cin >> unitPrice >> quantity;
+            keeper = new Merchant(unitPrice,quantity);
+        } else if (gateType == 2) {
+            int intelligenceIndex;
+            cin >> intelligenceIndex;
+            keeper = new Philosopher(intelligenceIndex);
+        } else if (gateType == 3) {
+            int strengthIndex;
+            cin >> strengthIndex;
+            keeper = new Warrior(strengthIndex);
+        }
+
+        if (keeper != nullptr) {
+            gates.push_back(new Gate(gateType, keeper));
+        }
+    }
+
+    int princeMoney, princeIntelligence, princeStrength;
+    cin >> princeMoney >> princeIntelligence >> princeStrength;
+
+    bool passAllGates = true;
+    for ( Gate* gate : gates) {
+        if (!gate->passGate(princeMoney, princeIntelligence, princeStrength)) {
+            passAllGates = false;
+            break;
+        }
+    }
+
+    if (passAllGates) {
+        cout << princeMoney << " " << princeIntelligence << " " << princeStrength << endl;
+    } else {
+        cout << "-1" << endl;
+    }
+
+    // Clean up allocated memory
+    for (Gate* gate : gates) {
+        delete gate;
+    }
+
+    return 0;
 }

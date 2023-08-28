@@ -41,15 +41,5 @@ public:
         Tung = t;
     }
 };
-int main() {
-    Diem A;
-    cout << "Nhap toa do cua A:" << endl;
-    A.nhap();
-    float dx, dy;
-    cout << "Nhap hoanh do va tung do muon tinh tien:";
-    cin >> dx >> dy;
-    A.Tinh_Tien(dx, dy);
-    A.xuat();
-    return 0;
-}
+
 

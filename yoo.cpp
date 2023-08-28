@@ -1,58 +1,125 @@
 #include <iostream>
+#include <vector>
+#include <string>
+
 using namespace std;
 
-struct Fraction {
-    int numerator;
-    int denominator;
+// Base class for all nv
+class NV {
+protected:
+    string ten;
+public:
+    NV(string ten) {
+        this->ten = ten;
+    }
+
+    string getName() {
+        return ten;
+    }
+
+    virtual float tinhLuong() = 0;
+    virtual int getSoSp() { return 0; }
+    virtual int getSNLV() { return 0; }
 };
 
-Fraction getFraction() {
-    Fraction f;
-    cin >> f.numerator >> f.denominator;
-    while (f.denominator == 0) {
-        cin >> f.denominator;
+// Production Worker class (Type 1)
+class NVSX : public NV {
+    float luongCb;
+    int soSp;
+public:
+    NVSX(string ten, float luongCb, int soSp) : NV(ten) {
+        this->luongCb = luongCb;
+        this->soSp = soSp;
     }
-    return f;
-}
 
-void printFraction(Fraction f) {
-    cout << f.numerator << "/" << f.denominator << endl;
-}
-
-bool isGreater(Fraction a, Fraction b) {
-    return (a.numerator * b.denominator > b.numerator * a.denominator);
-}
-
-bool isLess(Fraction a, Fraction b) {
-    return (a.numerator * b.denominator < b.numerator * a.denominator);
-}
-
-void findMinMaxFraction(Fraction arr[], int n, Fraction& minF, Fraction& maxF) {
-    minF = maxF = arr[0];
-    for (int i = 1; i < n; i++) {
-        if (isGreater(arr[i], maxF)) {
-            maxF = arr[i];
-        }
-        if (isLess(arr[i], minF)) {
-            minF = arr[i];
-        }
+    float tinhLuong() {
+        return luongCb + soSp * 5;
     }
-}
+
+    int getSoSp() {
+        return soSp;
+    }
+};
+
+// Office Worker class (Type 2)
+class NVVP : public NV {
+    int soNLV;
+public:
+    NVVP(string ten, int soNLV) : NV(ten) {
+        this->soNLV = soNLV;
+    }
+
+    float tinhLuong() {
+        return soNLV * 100;
+    }
+
+    int getSNLV() {
+        return soNLV;
+    }
+};
+
+// Sep class (Type 3)
+class Sep : public NV {
+    static int tongSp;
+    static int tongNLV;
+public:
+    Sep(string ten) : NV(ten) {}
+
+    float tinhLuong() {
+        return 100 + tongSp * 2 + tongNLV * 40;
+    }
+
+    static void updateStatistics(NV* employee) {
+        tongSp += employee->getSoSp();
+        tongNLV += employee->getSNLV();
+    }
+};
+
+int Sep::tongSp = 0;
+int Sep::tongNLV = 0;
 
 int main() {
-    int n;
-    cin >> n;
+    int slNV;
+    cin >> slNV;
 
-    Fraction arr[n];
-    for (int i = 0; i < n; i++) {
-        arr[i] = getFraction();
+    vector<NV*> nv;
+
+    for (int i = 0; i < slNV; i++) {
+        int loai;
+        string ten;
+
+        cin >> loai >> ten;
+
+        if (loai == 1) {
+            float luongCb;
+            int soSp;
+            cin >> luongCb >> soSp;
+            nv.push_back(new NVSX(ten, luongCb, soSp));
+        }
+        else if (loai == 2) {
+            int soNLV;
+            cin >> soNLV;
+            nv.push_back(new NVVP(ten, soNLV));
+        }
+        else if (loai == 3) {
+            nv.push_back(new Sep(ten));
+        }
     }
 
-    Fraction minF, maxF;
-    findMinMaxFraction(arr, n, minF, maxF);
+    for (int i = 0; i < slNV; i++) {
+        if (dynamic_cast<Sep*>(nv[i]) == nullptr) {
+            Sep::updateStatistics(nv[i]);
+        }
+    }
 
-    printFraction(minF);
-    printFraction(maxF);
+    for (int i = 0; i < slNV; i++) {
+        cout << nv[i]->getName() << ": " << nv[i]->tinhLuong() << endl;
+    }
+
+    // Deallocate memory for the dynamically created objects
+    for (int i = 0; i < slNV; i++) {
+        delete nv[i];
+    }
 
     return 0;
 }
